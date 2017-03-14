@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>任务四：基础JavaScript练习（一）</title>
+    <style type="text/css">
+        #listUl{
+            overflow:hidden;
+            list-style:none;
+            padding: 0px;
+            margin:2px;
+        }
+        #listUl li{
+            float: left;
+            left: 0px;
+            min-width: 25px;
+            height: 25px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            padding: 5px;
+            line-height: 25px;
+            text-align: center;
+            color: white;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <input id="listInput" type="text">
+    <button id="leftIn">左侧入</button>
+    <button id="rightIn">右侧入</button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="leftOut">左侧出</button>
+    <button id="rightOut">右侧出</button>
+    <ul id="listUl">
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+    </ul>
+    <script>
+        var listInput=document.getElementById("listInput");
+        var listUl=document.getElementById("listUl");
+
+        function operation(buttonId){
+            var listUl_lis=listUl.getElementsByTagName("li");
+            if(buttonId=="leftIn"||buttonId=="rightIn"){
+                var listInputText= listInput.value;
+                if(isNaN(listInputText)){
+                    return alert("不是数字！");
+                }
+                if(listInputText==""){
+                    return alert("请输入数字！");
+                }
+                    var newLi=document.createElement("li");
+                    newLi.innerText=listInputText;
+                    if(buttonId=="leftIn") {//左侧入
+                        //splice(插入或删除项起始位置,删除项数量, 插入项)
+                        listUl.insertBefore(newLi,listUl.childNodes[0]);
+                    }else if(buttonId=="rightIn"){//右侧入
+                        listUl.appendChild(newLi);
+                    }
+            }else {
+                if(listUl_lis.length==0){
+                    return alert("列表为空！");
+                }
+                if (buttonId == "leftOut") {//左侧出
+                    alert(listUl_lis[0].innerText);
+                    listUl.removeChild(listUl_lis[0]);
+                } else if (buttonId == "rightOut") {//右侧出
+                    alert(listUl_lis[listUl_lis.length-1].innerText);
+                    listUl.removeChild(listUl_lis[listUl_lis.length-1]);
+                }
+            }
+        }
+        //为按钮添加点击事件
+        window.addEventListener("click", function (e) {
+            if(e.target.id=="leftIn"||e.target.id=="rightIn"||e.target.id=="leftOut"||e.target.id=="rightOut"){
+                operation(e.target.id);
+            }
+        },false);
+        //点击队列中任何一个元素，则该元素会被从队列中删除
+        listUl.addEventListener("click", function (e) {
+            if(e.target!=null){
+                e.target.parentNode.removeChild(e.target);
+            }
+        },false);
+    </script>
+</body>
+</html>
