@@ -39,6 +39,10 @@
     <script>
         var listInput=document.getElementById("listInput");
         var listUl=document.getElementById("listUl");
+        var leftIn=document.getElementById("leftIn");
+        var rightIn=document.getElementById("rightIn");
+        var leftOut=document.getElementById("leftOut");
+        var rightOut=document.getElementById("rightOut");
 
         function operation(buttonId){
             var listUl_lis=listUl.getElementsByTagName("li");
@@ -72,14 +76,14 @@
             }
         }
         //为按钮添加点击事件
-        window.addEventListener("click", function (e) {
-            if(e.target.id=="leftIn"||e.target.id=="rightIn"||e.target.id=="leftOut"||e.target.id=="rightOut"){
-                operation(e.target.id);
-            }
-        },false);
+        leftIn.addEventListener("click", function (e){operation(e.target.id);},false);
+        rightIn.addEventListener("click", function (e){operation(e.target.id);},false);
+        leftOut.addEventListener("click", function (e){operation(e.target.id);},false);
+        rightOut.addEventListener("click", function (e){operation(e.target.id);},false);
+
         //点击队列中任何一个元素，则该元素会被从队列中删除
         listUl.addEventListener("click", function (e) {
-            if(e.target!=null){
+            if(e.target.parentNode.id== "listUl"){
                 e.target.parentNode.removeChild(e.target);
             }
         },false);
