@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>任务五：基础JavaScript练习（二）</title>
+    <style type="text/css">
+        #listUl{
+            overflow:hidden;
+            list-style:none;
+            padding: 0px;
+            margin:2px;
+        }
+        #listUl li{
+            position:relative;
+            float: left;
+            width:25px;
+            height:200px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .newLi-span{
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+            background-color: red;
+            color:rgba(0,0,0,0);
+        }
+    </style>
+</head>
+<body>
+<input id="listInput" type="text">
+    <span class="inputBtn">
+        <button id="leftIn">左侧入</button>
+        <button id="rightIn">右侧入</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="leftOut">左侧出</button>
+        <button id="rightOut">右侧出</button>
+    </span>
+    <button id="bubbleSortBtn">冒泡排序</button>
+<ul id="listUl"></ul>
+<script>
+    var listInput=document.getElementById("listInput");
+    var listUl=document.getElementById("listUl");
+    var inputBtn=document.querySelector(".inputBtn");
+    var bubbleSortBtn=document.getElementById("bubbleSortBtn");
+    var liCount=listUl.length;
+
+    //冒泡排序
+    function bubbleSort(domList,j) {
+        var temp = null;
+        //从小到大
+        if (domList[j].innerText > domList[j + 1].innerText) {
+           domList[j].childNodes[0].style.backgroundColor="#800000";
+           domList[j+1].childNodes[0].style.backgroundColor="red";
+           temp = domList[j].innerHTML;
+           domList[j].innerHTML = domList[j + 1].innerHTML;
+           domList[j + 1].innerHTML = temp;
+
+        }else{
+           domList[j].childNodes[0].style.backgroundColor="red";
+           domList[j+1].childNodes[0].style.backgroundColor="#800000";
+        }
+    }
+    //排序可视化
+    function draw(domList){
+        var i=0;
+        var j=0;
+        var drawSI=setInterval(function () {
+            bubbleSort(domList,j);
+            j++;
+            if(j==domList.length-i-1&&i<domList.length){
+                domList[domList.length-i-1].childNodes[0].style.backgroundColor="red";
+                j=0;i++;
+            }
+            if(i==domList.length-1){
+                clearInterval(drawSI);
+            }
+        },500);
+    }
+
+    function operation(buttonId){
+        var listUl_lis=listUl.getElementsByTagName("li");
+        if(buttonId=="leftIn"||buttonId=="rightIn"){
+            var listInputText= listInput.value;
+            if(isNaN(listInputText)){
+                return alert("不是数字！");
+            }
+            if(listInputText==""){
+                return alert("请输入数字！");
+            }
+            if(listUl_lis.length>60){
+                return alert("列表大于60个！");
+            }
+            if(listInputText<10||listInputText>100){
+                return alert("输入的数字不能小于10或大于100！");
+            }
+            var newLi=document.createElement("li");
+            newLi.innerHTML="<span class='newLi-span' style='height: "+listInputText*2+"px;'>"+listInputText+"</span>";
+
+            if(buttonId=="leftIn") {//左侧入
+                //splice(插入或删除项起始位置,删除项数量, 插入项)
+                listUl.insertBefore(newLi,listUl.childNodes[0]);
+            }else if(buttonId=="rightIn"){//右侧入
+                listUl.appendChild(newLi);
+            }
+        }else {
+            if(listUl_lis.length==0){
+                return alert("列表为空！");
+            }
+            if (buttonId == "leftOut") {//左侧出
+                listUl.removeChild(listUl_lis[0]);
+            } else if (buttonId == "rightOut") {//右侧出
+                listUl.removeChild(listUl_lis[listUl_lis.length-1]);
+            }
+        }
+    }
+    //为按钮添加点击事件
+    inputBtn.addEventListener("click", function (e){
+        if(e.target.nodeName == 'BUTTON'){
+            operation(e.target.id);
+        }
+    },false);
+    //点击队列中任何一个元素，则该元素会被从队列中删除
+    listUl.addEventListener("click", function (e) {
+        if(e.target.nodeName== "SPAN"){
+            e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+        }
+    },false);
+    //冒泡排序
+    bubbleSortBtn.addEventListener("click", function () {
+        draw(listUl.childNodes);
+        //bubbleSort(listUl.childNodes);
+    },false);
+</script>
+</body>
+</html>
