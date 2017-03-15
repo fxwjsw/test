@@ -27,10 +27,12 @@
 </head>
 <body>
     <input id="listInput" type="text">
-    <button id="leftIn">左侧入</button>
-    <button id="rightIn">右侧入</button>&nbsp;&nbsp;&nbsp;&nbsp;
-    <button id="leftOut">左侧出</button>
-    <button id="rightOut">右侧出</button>
+    <span class="inputBtn">
+        <button id="leftIn">左侧入</button>
+        <button id="rightIn">右侧入</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="leftOut">左侧出</button>
+        <button id="rightOut">右侧出</button>
+    </span>
     <ul id="listUl">
         <li>1</li>
         <li>2</li>
@@ -39,10 +41,7 @@
     <script>
         var listInput=document.getElementById("listInput");
         var listUl=document.getElementById("listUl");
-        var leftIn=document.getElementById("leftIn");
-        var rightIn=document.getElementById("rightIn");
-        var leftOut=document.getElementById("leftOut");
-        var rightOut=document.getElementById("rightOut");
+        var inputBtn=document.querySelector(".inputBtn");
 
         function operation(buttonId){
             var listUl_lis=listUl.getElementsByTagName("li");
@@ -76,11 +75,11 @@
             }
         }
         //为按钮添加点击事件
-        leftIn.addEventListener("click", function (e){operation(e.target.id);},false);
-        rightIn.addEventListener("click", function (e){operation(e.target.id);},false);
-        leftOut.addEventListener("click", function (e){operation(e.target.id);},false);
-        rightOut.addEventListener("click", function (e){operation(e.target.id);},false);
-
+        inputBtn.addEventListener("click", function (e){
+             if(e.target.nodeName == 'BUTTON'){
+                 operation(e.target.id);
+             }
+        },false);
         //点击队列中任何一个元素，则该元素会被从队列中删除
         listUl.addEventListener("click", function (e) {
             if(e.target.parentNode.id== "listUl"){
