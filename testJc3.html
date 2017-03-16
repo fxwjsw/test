@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>任务六：基础JavaScript练习（三）</title>
+    <style type="text/css">
+        #listTextarea{
+            width: 300px;
+            height: 100px;
+            padding: 10px;
+            text-align: left;
+            color:grey;
+        }
+        #listUl{
+            overflow:hidden;
+            list-style:none;
+            padding: 0px;
+            margin:2px;
+        }
+        #listUl li{
+            position:relative;
+            float: left;
+            height:50px;
+            text-align: center;
+            height: 50px;
+            margin: 5px;
+            padding: 5px;
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+<textarea id="listTextarea"  spellcheck="false">
+请输入数字、中文、英文等，并用英文半角“,”号隔开
+</textarea>
+<div>
+    <button id="textareaBtn">输入</button>
+    <button id="textareaClear">清空</button>
+</div>
+<div>
+    <input type="text" id="searchInput">
+    <button id="searchBtn">搜索</button>
+</div>
+<ul id="listUl"></ul>
+<script>
+    var listTextarea=document.getElementById("listTextarea");
+    var textareaBtn=document.getElementById("textareaBtn");
+    var textareaClear=document.getElementById("textareaClear");
+    var searchInput=document.getElementById("searchInput");
+    var searchBtn=document.getElementById("searchBtn");
+    var listUl=document.getElementById("listUl");
+    var listLi=listUl.getElementsByTagName("li");
+    var isClearTextarea=true;
+    //textarea输入
+    function textareaInput(){
+        var textareaText=listTextarea.value;
+        if(textareaText!=""){
+            var listTA=textareaText.split(",");
+            for(var i=0;i<listTA.length;i++){//去掉空格
+                if(listTA[i]==""||typeof(listTA[i])=="undefined"){
+                    listTA.splice(i,1);
+                    i=i-1;
+                }
+            }
+            for(var j=0;j<listTA.length;j++){
+                var newLi=document.createElement("li");
+                newLi.innerText=listTA[j];
+                listUl.appendChild(newLi);
+            }
+        }else{
+            return false;
+        }
+    }
+    //清空
+    function taClear(){
+        for(var i=0;i<listLi.length;i++){
+            listUl.removeChild(listLi[i]);
+            i=i-1;
+        }
+    }
+    //textarea模糊查询
+    function textareaSearch() {
+        var searchInputText=searchInput.value;
+        for(var j=0;j<listLi.length;j++){//设置查询关键字为红色
+            var liText=listLi[j].innerText;
+            if(liText.indexOf(searchInputText)>=0){
+                var newLiText=liText;
+                var colorText = "<span style='color:red'>"+searchInputText+"</span>";
+                newLiText = newLiText.replace(new RegExp(searchInputText, 'g'), colorText);
+                listLi[j].innerHTML=newLiText;
+            }else{
+                listLi[j].innerHTML=liText;
+            }
+        }
+    }
+    //为textarea添加获取焦点事件
+    listTextarea.addEventListener("focus", function (e){
+        if(e.target.id="listTextarea"){
+            if(isClearTextarea){
+                isClearTextarea=false;
+                listTextarea.value="";
+                listTextarea.style.color="black";
+            }
+        }
+    },false);
+    //为textarea添加失去焦点事件
+    listTextarea.addEventListener("blur", function (e){
+        if(e.target.id="listTextarea"){
+            if(listTextarea.value==""){
+                isClearTextarea=true;
+                listTextarea.value="请输入数字、中文、英文等，并用英文半角“,”号隔开";
+                listTextarea.style.color="grey";
+            }
+        }
+    },false);
+    //为输入按钮添加点击事件
+    textareaBtn.addEventListener("click", function (){
+        textareaInput();
+    },false);
+    //为搜索按钮添加点击事件
+    searchBtn.addEventListener("click", function (){
+        textareaSearch();
+    },false);
+    //清空
+    textareaClear.addEventListener("click", function (){
+        taClear();
+    },false);
+    //点击队列中任何一个元素，则该元素会被从队列中删除
+    listUl.addEventListener("click", function (e) {
+        if(e.target.nodeName== "LI"){
+            e.target.parentNode.removeChild(e.target);
+        }
+    },false);
+
+</script>
+</body>
+</html>
