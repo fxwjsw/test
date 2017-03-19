@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>任务七：JavaScript和树（一）</title>
+    <style type="text/css">
+        .nodeTree,.nodeTree div
+        {
+            overflow: hidden;
+            padding: 10px;
+            margin: 10px;
+            max-width: 800px;
+            border: 1px solid;
+            background-color: white;
+        }
+        .nodeTree div{
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <button class="firstIterationBtn">先序遍历</button>
+    <button class="secondIterationBtn">中序遍历</button>
+    <button class="lastIterationBtn">后序遍历</button>
+</div>
+<script>
+    /*
+    二叉树是一个有限元素的集合,该集合或者为空、或者由一个称为根的元素及两个不相交的、被分别称为左子树和右子树的二叉树组成。
+    性质1：二叉树第i层上的节点数目最多为2^i-1(i≥1);
+    性质2：深度为k的二叉树至多有2^k-1个结点(k≥1)。
+    性质3：在任意-棵二叉树中，若叶子结点（即度为0的结点）的个数为n0，度为1的结点数为n1，度为2的结点数为n2，则no=n2+1。
+    */
+    /*二叉树的节点对象*/
+    function Node(){
+        this.text='';//节点的文本
+        this.leftChild=null;//节点的左叉引用
+        this.rightChild=null;//节点的右叉引用
+        this.dom=null;//dom属性
+    }
+    Node.prototype.createDom= function () {
+        var nodeDom=document.createElement("div");
+        nodeDom.innerText=this.text;
+        return nodeDom;
+    }
+    var charecters= ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    /*递归构建二叉树*/
+    function  buildTree(node,i) {
+        var leftIndex=2*i+ 1,//左叉节点索引
+            rightIndex=2*i+2;//右叉节点索引
+        if(leftIndex<charecters.length){
+            var childNodeLeft=new Node();//创建新节点对象
+            childNodeLeft.text=charecters[leftIndex];//给节点赋值
+            node.leftChild=childNodeLeft;//给当前node节点加入左叉节点
+            childNodeLeft.dom=childNodeLeft.createDom();//创建dom
+            node.dom.appendChild(childNodeLeft.dom);
+            buildTree(childNodeLeft,leftIndex,childNodeLeft.dom);//递归创建左叉节点
+        }
+        if(rightIndex<charecters.length){
+            var childNodeRight=new Node();
+            childNodeRight.text=charecters[rightIndex];
+            node.rightChild=childNodeRight;
+            childNodeRight.dom=childNodeRight.createDom();//创建dom
+            node.dom.appendChild(childNodeRight.dom);
+            buildTree(childNodeRight,rightIndex);
+        }
+    }
+    //构造二叉树i从0开始
+    var node=new Node();
+    node.text=charecters[0];
+    node.dom=node.createDom();
+    node.dom.setAttribute("class","nodeTree");
+    document.body.appendChild(node.dom);
+    buildTree(node,0);
+
+    var domList=new Array();//用来保存遍历过程的dom节点数组
+    //先序遍历
+    function firstIteration(node) {
+        if(node!=null){
+            domList.push(node.dom);
+            firstIteration(node.leftChild);
+            firstIteration(node.rightChild);
+        }
+    }
+    //中序遍历
+    function secondIteration(node){
+        if(node!=null) {
+            secondIteration(node.leftChild);
+            domList.push(node.dom);
+            secondIteration(node.rightChild);
+        }
+    }
+    //后序遍历
+    function lastIteration(node){
+        if(node!=null) {
+            lastIteration(node.leftChild);
+            lastIteration(node.rightChild);
+            domList.push(node.dom);
+        }
+    }
+    var st=null;
+    //初始化
+    function init() {
+        if(st){
+            clearInterval(st);
+        }
+        if(domList.length>0) {
+            for (var i = 0; i < domList.length; i++) {
+                domList[i].style.backgroundColor="white";
+            }
+            domList=new Array();
+        }
+    }
+    //可视化
+    function drawDomList(domList){
+        var i=0;
+        if(i<domList.length){
+            st=setInterval(function () {
+                if(domList[i]!=null){
+                    domList[i].style.backgroundColor="red";
+                    (function (i){
+                    setTimeout(function(){
+                        domList[i].style.backgroundColor="white ";
+                    },500);
+                    })(i);
+                    i++;
+                }else{
+                    clearInterval(st);
+                }
+            },1000);
+        }
+    }
+    /*（1）前序遍历（DLR），首先访问根结点，然后遍历左子树，最后遍历右子树。简记根-左-右。
+     （2）中序遍历（LDR），首先遍历左子树，然后访问根结点，最后遍历右子树。简记左-根-右。
+     （3）后序遍历（LRD），首先遍历左子树，然后遍历右子树，最后访问根结点。简记左-右-根。*/
+    //先序遍历
+    var firstIterationBtn=document.querySelector(".firstIterationBtn");
+    firstIterationBtn.addEventListener("click", function () {
+        init();
+        firstIteration(node);
+        drawDomList(domList);
+    });
+    //中序遍历
+    var secondIterationBtn=document.querySelector(".secondIterationBtn");
+    secondIterationBtn.addEventListener("click", function () {
+        init();
+        secondIteration(node);
+        drawDomList(domList);
+    });
+    //后序遍历
+    var lastIterationBtn=document.querySelector(".lastIterationBtn");
+    lastIterationBtn.addEventListener("click", function () {
+        init();
+        lastIteration(node);
+        drawDomList(domList);
+    });
+</script>
+</body>
+</html>
