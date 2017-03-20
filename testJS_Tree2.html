@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>任务八：JavaScript和树（二）</title>
+    <style type="text/css">
+        .nodeTree,.nodeTree div
+        {
+            overflow: hidden;
+            padding: 10px;
+            margin: 10px;
+            max-width: 800px;
+            border: 1px solid;
+            background-color: white;
+        }
+        .nodeTree div{
+            float: left;
+        }
+        .stateSpan{
+            color: grey;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <button class="iterationTreeBtn">遍历树</button>
+</div>
+<div>
+    <input class="searchInput" type="text">&nbsp;&nbsp;
+    <button class="searchBtn">查询</button>&nbsp;&nbsp;
+    <span class="stateSpan">找到为红色</span>
+</div>
+<script>
+    /*树的节点对象*/
+    function Node(){
+        this.text='';//节点的文本
+        this.dom=null;//dom属性
+        this.childs=new Array();
+    }
+    Node.prototype.createDom= function () {
+        var nodeDom=document.createElement("div");
+        nodeDom.innerText=this.text;
+        return nodeDom;
+    }
+    var charecters=
+        ['A',
+            [
+                'B',
+                ['C', ['D'], ['E']], ['F'], [['G'], ['H']]
+            ],
+            [
+                'I',
+                ['J', ['K'], ['L'], ['M']], ['N', ['O', ['P']], ['Q', 'R', 'S']]
+            ],
+            ['T', 'U', 'V', 'W', 'X', 'Y'],
+            ['Z']
+        ];
+    /*递归构建树*/
+    function  buildTree(node,i,list) {
+       i++;
+       if(list) {
+           if (i < list.length){
+               if(list[i] instanceof Array){
+                   var childNode = new Node();//创建新节点对象
+                   node.childs[i] = childNode;
+                   childNode.dom = childNode.createDom();
+                   node.dom.appendChild(childNode.dom);
+                   buildTree(childNode,-1,list[i]);
+               }else{
+                   node.text+=list[i];
+                   node.dom.innerText+=list[i];
+               }
+               buildTree(node,i,list);
+           }
+       }
+    }
+    var node=new Node();
+    node.text=charecters[0];
+    node.dom=node.createDom();
+    node.dom.setAttribute("class","nodeTree");
+    document.body.appendChild(node.dom);
+    buildTree(node,0,charecters);
+
+    var domList=new Array();//用来保存遍历过程的dom节点数组
+    var textList=new Array();//用来保存遍历过程的节点text数组
+    var st=null;//可视化计时器
+    //遍历
+    function iteration(node) {
+        if(node!=null){
+            domList.push(node.dom);
+            textList.push(node.text);
+            for(var i=0;i<node.childs.length;i++){
+                iteration(node.childs[i]);
+            }
+        }
+    }
+    //初始化
+    function init() {
+        if(st){
+            clearInterval(st);
+        }
+        if(domList.length>0) {
+            for (var i = 0; i < domList.length; i++) {
+                domList[i].style.backgroundColor="white";
+            }
+            domList=new Array();
+        }
+    }
+    //可视化
+    function drawDomList(domList,inputText){
+        var i=0;
+        var isSearch=false;
+        if(i<domList.length){
+            st=setInterval(function () {
+                if(domList[i]!=null){
+                    var domColor="blue";
+                    if(inputText){
+                        if(inputText==textList[i]){
+                            domColor="red";
+                            isSearch=true;
+                        }
+                    }
+                    domList[i].style.backgroundColor=domColor;
+                    (function (i){
+                        setTimeout(function(){
+                            domList[i].style.backgroundColor="white ";
+                        },500);
+                    })(i);
+                    i++;
+                }else{
+                    clearInterval(st);
+                    if(inputText) {
+                        if (isSearch == false) {
+                            alert("未找到" + inputText);
+                        }
+                    }
+                }
+            },100);
+        }
+    }
+    var searchInput=document.querySelector(".searchInput");//查询input
+    var searchBtn=document.querySelector(".searchBtn");//查询按钮
+    searchBtn.addEventListener("click",function () {
+        var inputText=searchInput.value;
+        init();
+        iteration(node);
+        if(inputText!=""){
+            drawDomList(domList,inputText);
+        }
+    });
+
+    var iterationTreeBtn=document.querySelector(".iterationTreeBtn");//遍历
+    iterationTreeBtn.addEventListener("click", function () {
+        init();
+        iteration(node);
+        drawDomList(domList);
+    });
+
+</script>
+</body>
+</html>
