@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>任务九：JavaScript和树（三）</title>
+    <style type="text/css">
+        #nodeTree,#nodeTree div
+        {
+            overflow: hidden;
+            padding: 10px;
+            margin: 10px;
+            max-width: 800px;
+            border: 1px solid;
+        }
+        #nodeTree div{float: left;}
+        #nodeTree .checkedDiv{background-color: green;}
+        #nodeTree .noChecked{background-color: white;}
+        .stateSpan{color: grey;}
+        .operationDiv{margin: 10px;}
+    </style>
+</head>
+<body>
+<div class="operationDiv">
+    <button class="iterationTreeBtn">遍历树</button>
+</div>
+<div class="operationDiv">
+    <input class="searchInput" type="text">&nbsp;&nbsp;
+    <button class="searchBtn">查询</button>&nbsp;&nbsp;
+    <span class="stateSpan">找到为红色</span>
+</div>
+<div class="operationDiv">
+    <input class="addInput" type="text">&nbsp;&nbsp;
+    <button class="addBtn">增加</button>&nbsp;&nbsp;
+    <button class="deleteTreeBtn">删除</button>
+</div>
+
+<script>
+    /*树的节点对象*/
+    function Node(){
+        this.text='';//节点的文本
+        this.dom=null;//dom属性
+        this.childs=new Array();
+    }
+    Node.prototype.createDom= function () {
+        var nodeDom=document.createElement("div");
+        nodeDom.innerText=this.text;
+        return nodeDom;
+    }
+    var charecters=
+            ['A',
+                [
+                    'B',
+                    ['C', ['D'], ['E']], ['F'], [['G'], ['H']]
+                ],
+                [
+                    'I',
+                    ['J', ['K'], ['L'], ['M']], ['N', ['O', ['P']], ['Q', 'R', 'S']]
+                ],
+                ['T', 'U', 'V', 'W', 'X', 'Y'],
+                ['Z']
+            ];
+    /*递归构建树*/
+    function  buildTree(node,i,list) {
+        i++;
+        if(list) {
+            if (i < list.length){
+                if(list[i] instanceof Array){
+                    var childNode = new Node();//创建新节点对象
+                    node.childs[i] = childNode;
+                    childNode.dom = childNode.createDom();
+                    node.dom.appendChild(childNode.dom);
+                    buildTree(childNode,-1,list[i]);
+                }else{
+                    node.text+=list[i];
+                    node.dom.innerText+=list[i];
+                    node.dom.setAttribute("domText",node.text);
+                }
+                buildTree(node,i,list);
+            }
+        }
+    }
+    var node=new Node();
+    node.text=charecters[0];
+    node.dom=node.createDom();
+    node.dom.setAttribute("id","nodeTree");
+    node.dom.setAttribute("domText",node.text);
+    document.body.appendChild(node.dom);
+
+    var nodeTree=document.getElementById("nodeTree");
+    nodeTree.addEventListener("click",function(e){
+        var checkedDiv=document.querySelector(".checkedDiv");
+        nodeTree.setAttribute("class","noChecked");
+        nodeTree.style.backgroundColor="white";
+        if(checkedDiv){
+            checkedDiv.setAttribute("class","noChecked");
+            checkedDiv.style.backgroundColor="White";
+        }
+        if(e.target){
+            if(e.target.id=="nodeTree"){
+                nodeTree.setAttribute("class","checkedDiv");
+                nodeTree.style.backgroundColor="green";
+            }else{
+                e.target.setAttribute("class","checkedDiv");
+                e.target.style.backgroundColor="green";
+            }
+        }
+    });
+    buildTree(node,0,charecters);
+
+    var domList=new Array();//用来保存遍历过程的dom节点数组
+    var st=null;//可视化计时器
+    //dom遍历
+    function iterationDom(dom){
+        if(dom!=null){
+            dom.style.backgroundColor="white";
+            dom.setAttribute("class","noChecked");
+            domList.push(dom);
+            for(var i=0;i<dom.children.length;i++){
+                iterationDom(dom.children[i]);
+            }
+        }
+    }
+    //初始化
+    function init() {
+        if(st){clearInterval(st);}
+        domList=new Array();
+        iterationDom(nodeTree);
+    }
+    //可视化
+    function drawDomList(domList,inputText){
+        var i=0;
+        var isSearch=false;
+        console.log(domList[0].getAttribute("domText"));
+        st=setInterval(function () {
+            if(i<domList.length){
+                if(domList[i]!=null){
+                    var domColor="blue";
+                    if(inputText){
+                        if(inputText==domList[i].getAttribute("domText")){
+                            domColor="red";
+                            isSearch=true;
+                        }
+                    }
+                    domList[i].style.backgroundColor=domColor;
+                    (function (i){
+                        setTimeout(function(){
+                            if(domList[i].style.backgroundColor!="red"){
+                                domList[i].style.backgroundColor="white";
+                            }
+                        },500);
+                    })(i);
+                    i++;
+                }
+            }
+            if(i==domList.length){
+                    clearInterval(st);
+                    if(inputText) {
+                        if (isSearch == false) {
+                            setTimeout(function(){alert("未找到" + inputText);},600);
+                        }
+                    }
+            }
+        },100);
+    }
+    var searchInput=document.querySelector(".searchInput");//查询input
+    var searchBtn=document.querySelector(".searchBtn");//查询按钮
+    searchBtn.addEventListener("click",function () {
+        var inputText=searchInput.value;
+        init();
+        if(inputText!=""){
+            drawDomList(domList,inputText);
+        }
+    });
+    var iterationTreeBtn=document.querySelector(".iterationTreeBtn");//遍历
+    iterationTreeBtn.addEventListener("click", function () {
+        init();
+        drawDomList(domList);
+    });
+
+    var addInput=document.querySelector(".addInput");//增加input
+    var addBtn=document.querySelector(".addBtn");//增加按钮
+    addBtn.addEventListener("click",function () {
+        var checkedDiv=document.querySelector(".checkedDiv");//选中div
+        if(checkedDiv){
+            var addText=addInput.value;
+            var addDiv=document.createElement("div");
+            addDiv.innerText=addText;
+            addDiv.setAttribute("domText",addText);
+            checkedDiv.appendChild(addDiv);
+        }
+    });
+    var deleteTreeBtn=document.querySelector(".deleteTreeBtn");//删除
+    deleteTreeBtn.addEventListener("click", function () {
+        var checkedDiv=document.querySelector(".checkedDiv");//选中div
+        if(checkedDiv){
+            checkedDiv.outerHTML=null;
+        }
+    });
+</script>
+</body>
+</html>
